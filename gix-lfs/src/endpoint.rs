@@ -208,7 +208,7 @@ fn bstr_to_string(value: &BStr) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{classify, Endpoint, Http, Ssh, UrlKind};
+    use super::{Endpoint, Http, Ssh, UrlKind, classify};
 
     #[test]
     fn remote_https_urls_get_the_lfs_suffix() {
