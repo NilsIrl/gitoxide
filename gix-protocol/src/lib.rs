@@ -30,6 +30,8 @@ pub enum Command {
     LsRefs,
     /// Fetch a pack.
     Fetch,
+    /// Obtain information about objects, like their size, without fetching them.
+    ObjectInfo,
 }
 pub mod command;
 
@@ -68,6 +70,11 @@ pub use handshake::hero::Handshake;
 pub mod ls_refs;
 #[cfg(any(feature = "blocking-client", feature = "async-client"))]
 pub use ls_refs::function::LsRefsCommand;
+
+///
+pub mod object_info;
+#[cfg(any(feature = "blocking-client", feature = "async-client"))]
+pub use object_info::function::ObjectInfoCommand;
 
 mod util;
 pub use util::*;
