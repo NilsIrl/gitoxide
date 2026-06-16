@@ -10,7 +10,7 @@ mod v1 {
         mod default_features {
             use gix_protocol::Command;
 
-            use super::super::{GITHUB_CAPABILITIES, capabilities};
+            use super::super::{capabilities, GITHUB_CAPABILITIES};
 
             #[test]
             fn it_chooses_the_best_multi_ack_and_sideband() {
@@ -127,16 +127,14 @@ mod v2 {
 
             #[test]
             fn ref_prefixes_can_always_be_used() {
-                assert!(
-                    Command::LsRefs
-                        .validate_argument_prefixes(
-                            gix_transport::Protocol::V2,
-                            &capabilities("something else", "do-not-matter"),
-                            &[b"ref-prefix hello/".as_bstr().into()],
-                            &[],
-                        )
-                        .is_ok()
-                );
+                assert!(Command::LsRefs
+                    .validate_argument_prefixes(
+                        gix_transport::Protocol::V2,
+                        &capabilities("something else", "do-not-matter"),
+                        &[b"ref-prefix hello/".as_bstr().into()],
+                        &[],
+                    )
+                    .is_ok());
             }
 
             #[test]
@@ -168,6 +166,68 @@ mod v2 {
                         .unwrap_err()
                         .to_string(),
                     "ls-refs: capability some-feature-that-does-not-exist is not supported"
+                );
+            }
+        }
+    }
+
+    mod object_info {
+        use gix_protocol::Command;
+
+        #[test]
+        fn name_is_object_info() {
+            assert_eq!(Command::ObjectInfo.as_str(), "object-info");
+        }
+
+        mod default_features {
+            use gix_protocol::Command;
+
+            use super::super::capabilities;
+
+            #[test]
+            fn no_features_are_negotiated() {
+                assert_eq!(
+                    Command::ObjectInfo
+                        .default_features(gix_transport::Protocol::V2, &capabilities("object-info", "size")),
+                    &[]
+                );
+            }
+        }
+
+        mod validate {
+            use bstr::ByteSlice;
+            use gix_protocol::Command;
+
+            use super::super::capabilities;
+
+            #[test]
+            fn size_attribute_and_oid_arguments_are_allowed() {
+                assert!(Command::ObjectInfo
+                    .validate_argument_prefixes(
+                        gix_transport::Protocol::V2,
+                        &capabilities("object-info", "size"),
+                        &[
+                            b"size".as_bstr().into(),
+                            b"oid e3bc2bf75d3816a3e60c0a0b27f87a3b9b8a4f99".as_bstr().into(),
+                        ],
+                        &[("agent", None)],
+                    )
+                    .is_ok());
+            }
+
+            #[test]
+            fn unknown_argument_is_rejected() {
+                assert_eq!(
+                    Command::ObjectInfo
+                        .validate_argument_prefixes(
+                            gix_transport::Protocol::V2,
+                            &capabilities("object-info", "size"),
+                            &[b"definitely-nothing-we-know".as_bstr().into()],
+                            &[],
+                        )
+                        .unwrap_err()
+                        .to_string(),
+                    "object-info: argument definitely-nothing-we-know is not known or allowed"
                 );
             }
         }

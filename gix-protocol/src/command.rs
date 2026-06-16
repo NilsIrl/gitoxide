@@ -12,6 +12,7 @@ impl Command {
         match self {
             Command::LsRefs => "ls-refs",
             Command::Fetch => "fetch",
+            Command::ObjectInfo => "object-info",
         }
     }
 }
@@ -21,7 +22,7 @@ mod with_io {
     use bstr::{BString, ByteSlice};
     use gix_transport::client::Capabilities;
 
-    use crate::{Command, command::Feature};
+    use crate::{command::Feature, Command};
 
     impl Command {
         /// Only V2
@@ -52,6 +53,10 @@ mod with_io {
                     "packfile-uris ", // protocols
                     // wait-for-done feature
                     "wait-for-done",
+                ],
+                Command::ObjectInfo => &[
+                    "size", // request the object size attribute
+                    "oid ", // hex oid, one per object to query
                 ],
             }
         }
@@ -87,6 +92,7 @@ mod with_io {
                         "wait-for-done",
                     ],
                 },
+                Command::ObjectInfo => &[],
             }
         }
 
@@ -109,6 +115,7 @@ mod with_io {
                     )
                     .collect(),
                 Command::LsRefs => vec![b"symrefs".as_bstr().to_owned(), b"peel".as_bstr().to_owned()],
+                Command::ObjectInfo => Vec::new(),
             }
         }
 
@@ -156,6 +163,7 @@ mod with_io {
                     }
                 },
                 Command::LsRefs => vec![],
+                Command::ObjectInfo => vec![],
             }
         }
         /// Return an error if the given `arguments` and `features` don't match what's statically known.
