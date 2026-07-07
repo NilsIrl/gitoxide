@@ -10,7 +10,7 @@ mod v1 {
         mod default_features {
             use gix_protocol::Command;
 
-            use super::super::{capabilities, GITHUB_CAPABILITIES};
+            use super::super::{GITHUB_CAPABILITIES, capabilities};
 
             #[test]
             fn it_chooses_the_best_multi_ack_and_sideband() {
@@ -127,14 +127,16 @@ mod v2 {
 
             #[test]
             fn ref_prefixes_can_always_be_used() {
-                assert!(Command::LsRefs
-                    .validate_argument_prefixes(
-                        gix_transport::Protocol::V2,
-                        &capabilities("something else", "do-not-matter"),
-                        &[b"ref-prefix hello/".as_bstr().into()],
-                        &[],
-                    )
-                    .is_ok());
+                assert!(
+                    Command::LsRefs
+                        .validate_argument_prefixes(
+                            gix_transport::Protocol::V2,
+                            &capabilities("something else", "do-not-matter"),
+                            &[b"ref-prefix hello/".as_bstr().into()],
+                            &[],
+                        )
+                        .is_ok()
+                );
             }
 
             #[test]
@@ -202,17 +204,19 @@ mod v2 {
 
             #[test]
             fn size_attribute_and_oid_arguments_are_allowed() {
-                assert!(Command::ObjectInfo
-                    .validate_argument_prefixes(
-                        gix_transport::Protocol::V2,
-                        &capabilities("object-info", "size"),
-                        &[
-                            b"size".as_bstr().into(),
-                            b"oid e3bc2bf75d3816a3e60c0a0b27f87a3b9b8a4f99".as_bstr().into(),
-                        ],
-                        &[("agent", None)],
-                    )
-                    .is_ok());
+                assert!(
+                    Command::ObjectInfo
+                        .validate_argument_prefixes(
+                            gix_transport::Protocol::V2,
+                            &capabilities("object-info", "size"),
+                            &[
+                                b"size".as_bstr().into(),
+                                b"oid e3bc2bf75d3816a3e60c0a0b27f87a3b9b8a4f99".as_bstr().into(),
+                            ],
+                            &[("agent", None)],
+                        )
+                        .is_ok()
+                );
             }
 
             #[test]

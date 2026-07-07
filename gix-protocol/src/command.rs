@@ -22,7 +22,7 @@ mod with_io {
     use bstr::{BString, ByteSlice};
     use gix_transport::client::Capabilities;
 
-    use crate::{command::Feature, Command};
+    use crate::{Command, command::Feature};
 
     impl Command {
         /// Only V2
